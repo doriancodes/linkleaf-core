@@ -32,10 +32,15 @@ path = "examples/gen_rss_feed.rs"
 [dependencies]
 prost = "0.13"
 tracing = { version = "0.1", optional = true }
-anyhow.workspace = true
-time.workspace = true
-serde.workspace = true
-uuid.workspace = true
+anyhow = "1.0"
+time = { version = "0.3", features = [
+    "formatting",
+    "parsing",
+    "macros",
+    "local-offset",
+] }
+serde = { version = "1.0.219", features = ["derive"] }
+uuid = { version = "1.18.0", features = ["serde", "v4"] }
 rss = "2.0.12"
 prost-types = {version = "0.14.1", features = ["chrono"]}
 chrono = "0.4.42"
