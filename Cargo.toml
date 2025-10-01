@@ -1,0 +1,60 @@
+[package]
+name = "linkleaf-core"
+version = "0.1.1"
+edition = "2024"
+description = "Local-first protobuf-only link feed manager (linkleaf.v1) library"
+readme = "README.md"
+license = "BSD-3-Clause"
+repository = "https://github.com/doriancodes/linkleaf-core"
+homepage = "https://github.com/doriancodes/linkleaf-core"
+documentation = "https://docs.rs/linkleaf-core"
+keywords = ["protobuf", "prost", "links", "feed", "local-first"]
+categories = ["data-structures", "encoding", "filesystem"]
+
+include = [
+    "src/**",
+    "proto/**",
+    "build.rs",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE",
+]
+
+[features]
+# Opt-in logging for this library.
+# Downstream can enable with: `features = ["logs"]`
+logs = ["dep:tracing"]
+
+[[example]]
+name = "gen_rss_feed"
+path = "examples/gen_rss_feed.rs"
+
+[dependencies]
+prost = "0.13"
+tracing = { version = "0.1", optional = true }
+anyhow.workspace = true
+time.workspace = true
+serde.workspace = true
+uuid.workspace = true
+rss = "2.0.12"
+prost-types = {version = "0.14.1", features = ["chrono"]}
+chrono = "0.4.42"
+
+
+
+[dev-dependencies]
+tempfile = "3"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[build-dependencies]
+prost-build = "0.13"
+protoc-bin-vendored = "3"
+prost-types = {version = "0.14.1", features = ["chrono"]}
+
+[badges]
+maintenance = { status = "actively-developed" }
+
+# Ensure docs.rs builds pick defaults that compile
+[package.metadata.docs.rs]
+all-features = false
+no-default-features = false
