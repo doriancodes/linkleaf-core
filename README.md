@@ -106,3 +106,8 @@ cargo run --example gen_rss_feed
 ## TODO
 - add tag next release
 - use git-cliff
+
+# Fixes
+- list filters only by date (not datetime)
+- DateTime::new()
+- Summary::new and Via::new accept both &str and String
