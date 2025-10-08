@@ -68,6 +68,19 @@ message DateTime {
   int32 nanos = 7;
 }
 
+message Date {
+  // Optional. Year of date. Must be from 1 to 9999, or 0 if specifying a
+  // datetime without a year.
+  int32 year = 1;
+
+  // Required. Month of year. Must be from 1 to 12.
+  int32 month = 2;
+
+  // Required. Day of month. Must be from 1 to 31 and valid for the year and
+  // month.
+  int32 day = 3;
+}
+
 // Summary of the Link. Optional.
 // Can contain a brief description, excerpt, or notes about the link.
 // Typically used to provide context for the reader.

@@ -5,13 +5,12 @@ pub mod linkleaf_proto {
 }
 
 use crate::fs::{read_feed, write_feed};
-use crate::linkleaf_proto::{DateTime, Feed, Link, Summary, Via};
+use crate::linkleaf_proto::{Date, DateTime, Feed, Link, Summary, Via};
 use anyhow::Result;
 use chrono::{FixedOffset, TimeZone};
 use rss::{CategoryBuilder, ChannelBuilder, GuidBuilder, Item, ItemBuilder};
 use std::path::Path;
-use time::Month;
-use time::OffsetDateTime;
+use time::{Month, OffsetDateTime};
 use uuid::Uuid;
 
 fn is_not_found(err: &anyhow::Error) -> bool {
@@ -312,7 +311,7 @@ where
 pub fn list<P: AsRef<Path>>(
     file: P,
     tags: Option<Vec<String>>,
-    datetime: Option<DateTime>,
+    date: Option<Date>,
 ) -> Result<Feed> {
     let file = file.as_ref();
     let mut feed = read_feed(file)?;
@@ -324,7 +323,7 @@ pub fn list<P: AsRef<Path>>(
             .collect()
     });
 
-    let date_filter: Option<&DateTime> = datetime.as_ref();
+    let date_filter: Option<&Date> = date.as_ref();
 
     feed.links.retain(|l| {
         let tag_ok = match &tag_norms {
@@ -336,7 +335,11 @@ pub fn list<P: AsRef<Path>>(
         };
 
         let date_ok = match date_filter {
-            Some(p) => l.datetime.as_ref().map(|dt| dt == p).unwrap_or(false),
+            Some(p) => l
+                .datetime
+                .as_ref()
+                .map(|dt| &dt.to_date() == p)
+                .unwrap_or(false),
             None => true,
         };
 
@@ -346,7 +349,33 @@ pub fn list<P: AsRef<Path>>(
     Ok(feed)
 }
 
+impl Date {
+    pub fn new(year: i32, month: i32, day: i32) -> Date {
+        Self { year, month, day }
+    }
+}
+
 impl DateTime {
+    pub fn new(
+        year: i32,
+        month: i32,
+        day: i32,
+        hours: i32,
+        minutes: i32,
+        seconds: i32,
+        nanos: i32,
+    ) -> DateTime {
+        Self {
+            year,
+            month,
+            day,
+            hours,
+            minutes,
+            seconds,
+            nanos,
+        }
+    }
+
     /// Converts this `DateTime` to an RFC 2822 string.
     ///
     /// Returns `None` if any field is invalid (e.g., month > 12, day > 31).
@@ -366,6 +395,10 @@ impl DateTime {
             })?;
 
         Some(dt.to_rfc2822())
+    }
+
+    pub fn to_date(&self) -> Date {
+        Date::new(self.year, self.month, self.day)
     }
 }
 
@@ -887,7 +920,7 @@ mod tests {
         let dt2 = DateTime {
             year: 2025,
             month: 1,
-            day: 3,
+            day: 4,
             hours: 23,
             minutes: 59,
             seconds: 59,
@@ -898,11 +931,11 @@ mod tests {
         let l2 = mk_link("2", "Jan03", "https://2/", dt2, &[], "", "");
         write_feed(&file, mk_feed(vec![l1.clone(), l2.clone()]))?;
 
-        let filtered = list(&file, None, Some(dt2))?;
+        let filtered = list(&file, None, Some(dt2.to_date()))?;
         assert_eq!(filtered.links.len(), 1);
         assert_eq!(filtered.links[0].id, l2.id);
 
-        let filtered2 = list(&file, None, Some(dt1))?;
+        let filtered2 = list(&file, None, Some(dt1.to_date()))?;
         assert_eq!(filtered2.links.len(), 1);
         assert_eq!(filtered2.links[0].id, l1.id);
 
