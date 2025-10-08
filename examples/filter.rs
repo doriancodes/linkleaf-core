@@ -77,7 +77,7 @@ fn main() -> Result<()> {
     // Filter by date
     let today = OffsetDateTime::now_utc().to_offset(UtcOffset::current_local_offset()?);
     let today = to_proto_datetime(&today)?;
-    let today_only = list(&file, None, Some(today))?;
+    let today_only = list(&file, None, Some(today.to_date()))?;
     println!("today_only: {}", today_only.links.len());
 
     Ok(())

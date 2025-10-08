@@ -17,31 +17,9 @@ package linkleaf.v1;
 
 // Represents civil time (or occasionally physical time).
 //
-// This type can represent a civil time in one of a few possible ways:
-//
-//  * When utc_offset is set and time_zone is unset: a civil time on a calendar
-//    day with a particular offset from UTC.
-//  * When time_zone is set and utc_offset is unset: a civil time on a calendar
-//    day in a particular time zone.
-//  * When neither time_zone nor utc_offset is set: a civil time on a calendar
-//    day in local time.
-//
 // The date is relative to the Proleptic Gregorian Calendar.
-//
-// If year is 0, the DateTime is considered not to have a specific year. month
-// and day must have valid, non-zero values.
-//
-// This type may also be used to represent a physical time if all the date and
-// time fields are set and either case of the `time_offset` oneof is set.
-// Consider using `Timestamp` message for physical time instead. If your use
-// case also would like to store the user's timezone, that can be done in
-// another field.
-//
-// This type is more flexible than some applications may want. Make sure to
-// document and validate your application's limitations.
 message DateTime {
-  // Optional. Year of date. Must be from 1 to 9999, or 0 if specifying a
-  // datetime without a year.
+  // Optional. Year of date. Must be from 0 to 9999
   int32 year = 1;
 
   // Required. Month of year. Must be from 1 to 12.
@@ -66,6 +44,29 @@ message DateTime {
   // Required. Fractions of seconds in nanoseconds. Must be from 0 to
   // 999,999,999.
   int32 nanos = 7;
+}
+
+// Represents a civil date in the Gregorian calendar (without a time component).
+//
+// This message is suitable for representing dates such as birthdays, anniversaries,
+// publication dates, or any event where the *day* is important but the *time of day*
+// is not required.
+//
+// The date is based on the Proleptic Gregorian calendar and must represent a valid
+// calendar date (e.g., month and day values must be appropriate for the year).
+//
+// Example usage:
+//   - A full date: 2025-10-08
+message Date {
+  // Optional. Year of date. Must be from 0 to 9999
+  int32 year = 1;
+
+  // Required. Month of year. Must be from 1 to 12.
+  int32 month = 2;
+
+  // Required. Day of month. Must be from 1 to 31 and valid for the year and
+  // month.
+  int32 day = 3;
 }
 
 // Summary of the Link. Optional.
